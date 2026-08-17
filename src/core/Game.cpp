@@ -49,7 +49,7 @@ void Game::processEvents() {
         if (event.type == SDL_EVENT_QUIT) {
             running = false;
         }
-        player.handleInput();
+        player.handleInput(event);
     }
 }
 

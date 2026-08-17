@@ -6,7 +6,9 @@ class Player {
 public:
     Player(float x, float y);
 
-    void handleInput();
+    void handleInput(const SDL_Event &event);
+    void jump();
+
     void update(float deltaTime);
     void render(SDL_Renderer* renderer);
 
@@ -22,8 +24,14 @@ private:
 
     float speed;
     float gravity;
+    float jumpForce;
+
+    float jumpBufferTimer;
+    float jumpBufferDuration;
 
     bool onGround;
+    bool movingLeft;
+    bool movingRight;
 };
 
 #endif //SOMBRAESCARLATE_PLAYER_HPP
