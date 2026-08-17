@@ -32,6 +32,7 @@ private:
     bool onGround;
     bool movingLeft;
     bool movingRight;
+    bool jumpHeld;
 };
 
 #endif //SOMBRAESCARLATE_PLAYER_HPP

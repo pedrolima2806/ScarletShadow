@@ -13,41 +13,48 @@ Player::Player(float x, float y):
     onGround(false),
     movingLeft(false),
     movingRight(false),
+    jumpHeld(false),
     jumpBufferTimer(0.0f),
     jumpBufferDuration(0.12f)
 {}
 
-void Player::handleInput(const SDL_Event &event) {
-    //Tecla Pressionada
-    if (event.type == SDL_EVENT_KEY_DOWN) {
+void Player::handleInput(const SDL_Event& event)
+{
+    if (event.type == SDL_EVENT_KEY_DOWN)
+    {
         if (event.key.scancode == SDL_SCANCODE_A)
-        { movingLeft = true;}
+        {
+            movingLeft = true;
+        }
 
         if (event.key.scancode == SDL_SCANCODE_D)
-        { movingRight = true;}
-
-        if (event.key.scancode == SDL_SCANCODE_SPACE &&
-            !event.key.repeat)
         {
-            jumpBufferTimer = jumpBufferDuration;
+            movingRight = true;
+        }
+
+        if (event.key.scancode == SDL_SCANCODE_SPACE)
+        {
+            jumpHeld = true;
         }
     }
 
-    //Tecla Solta
     if (event.type == SDL_EVENT_KEY_UP)
     {
         if (event.key.scancode == SDL_SCANCODE_A)
-        { movingLeft = false;}
+        {
+            movingLeft = false;
+        }
 
         if (event.key.scancode == SDL_SCANCODE_D)
-        { movingRight = false;}
+        {
+            movingRight = false;
+        }
+
+        if (event.key.scancode == SDL_SCANCODE_SPACE)
+        {
+            jumpHeld = false;
+        }
     }
-
-    //Movimento Horizontal
-    velocityX = 0.0f;
-
-    if (movingLeft) { velocityX -= speed;}
-    if (movingRight) { velocityX += speed;}
 }
 
 void Player::jump() {
@@ -58,17 +65,9 @@ void Player::jump() {
     }
 }
 
-void Player::update(float deltaTime) {
-    // Evita que um frame absurdamente longo destrua a física
-    if (deltaTime > 0.05f)
-    {
-        deltaTime = 0.05f;
-    }
-
-    // -------------------------
+void Player::update(float deltaTime)
+{
     // Movimento horizontal
-    // -------------------------
-
     velocityX = 0.0f;
 
     if (movingLeft)
@@ -81,69 +80,32 @@ void Player::update(float deltaTime) {
         velocityX += speed;
     }
 
-    // -------------------------
     // Pulo
-    // -------------------------
-
-    // Se já estamos no chão e existe um pedido de pulo,
-    // executamos ANTES de aplicar a física.
-    if (onGround && jumpBufferTimer > 0.0f)
+    if (jumpHeld && onGround)
     {
         velocityY = -jumpForce;
         onGround = false;
-
-        jumpBufferTimer = 0.0f;
     }
 
-    // -------------------------
     // Gravidade
-    // -------------------------
-
     velocityY += gravity * deltaTime;
 
-    // -------------------------
     // Movimento
-    // -------------------------
-
     x += velocityX * deltaTime;
     y += velocityY * deltaTime;
 
-    // -------------------------
     // Solo
-    // -------------------------
-
     const float groundY = 400.0f;
-
-    onGround = false;
 
     if (y + height >= groundY)
     {
         y = groundY - height;
         velocityY = 0.0f;
         onGround = true;
-
-        // O jogador apertou SPACE pouco antes de aterrissar?
-        if (jumpBufferTimer > 0.0f)
-        {
-            velocityY = -jumpForce;
-            onGround = false;
-
-            jumpBufferTimer = 0.0f;
-        }
     }
-
-    // -------------------------
-    // Atualiza jump buffer
-    // -------------------------
-
-    if (jumpBufferTimer > 0.0f)
+    else
     {
-        jumpBufferTimer -= deltaTime;
-
-        if (jumpBufferTimer < 0.0f)
-        {
-            jumpBufferTimer = 0.0f;
-        }
+        onGround = false;
     }
 }
 
