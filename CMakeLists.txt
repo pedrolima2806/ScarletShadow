@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 4.3)
+
+project(SombraEscarlate LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# ============================================================
+# Bibliotecas vendored
+# ============================================================
+
+add_subdirectory(vendor/SDL)
+add_subdirectory(vendor/SDL_image)
+add_subdirectory(vendor/SDL_mixer)
+add_subdirectory(vendor/SDL_ttf)
+
+# ============================================================
+# Executável
+# ============================================================
+
+add_executable(SombraEscarlate
+        src/main.cpp
+)
+
+# ============================================================
+# Includes
+# ============================================================
+
+target_include_directories(SombraEscarlate PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# ============================================================
+# Bibliotecas
+# ============================================================
+
+target_link_libraries(SombraEscarlate PRIVATE
+        SDL3::SDL3
+        SDL3_image::SDL3_image
+        SDL3_mixer::SDL3_mixer
+        SDL3_ttf::SDL3_ttf
+)

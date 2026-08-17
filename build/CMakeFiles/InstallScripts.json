@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/pedro/code/SombraEscarlate/build/cmake_install.cmake",
+		"/home/pedro/code/SombraEscarlate/build/vendor/SDL/cmake_install.cmake",
+		"/home/pedro/code/SombraEscarlate/build/vendor/SDL_image/cmake_install.cmake",
+		"/home/pedro/code/SombraEscarlate/build/vendor/SDL_mixer/cmake_install.cmake",
+		"/home/pedro/code/SombraEscarlate/build/vendor/SDL_ttf/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
