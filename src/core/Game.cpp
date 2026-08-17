@@ -4,7 +4,8 @@
 #include <ostream>
 
 Game::Game()
-    :running(false), window(nullptr), renderer(nullptr){}
+    : running(true), window(nullptr), renderer(nullptr), player(100.f, 100.f) {
+}
 
 Game::~Game() {
     if (renderer != nullptr) SDL_DestroyRenderer(renderer);
@@ -20,8 +21,8 @@ bool Game::init() {
     }
     if (!SDL_CreateWindowAndRenderer(
             "Sombra Escarlate",
-            1280,
-            720,
+            640,
+            480,
             0,
             &window,
             &renderer))
@@ -45,15 +46,21 @@ void Game::run() {
 void Game::processEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
+        if (event.type == SDL_EVENT_QUIT) {
             running = false;
         }
+        player.handleInput();
     }
 }
 
 //Update
 void Game::update() {
+    Uint64 currentTime = SDL_GetTicks();
 
+    float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
+    lastTime = currentTime;
+
+    player.update(deltaTime);
 }
 
 //Renderização
@@ -67,5 +74,8 @@ void Game::render() {
     );
 
     SDL_RenderClear(renderer);
+
+    player.render(renderer);
+
     SDL_RenderPresent(renderer);
 }

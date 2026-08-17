@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL.h>
 
+#include "../entities/Player.hpp"
+
 class Game {
 public:
     Game();
@@ -20,6 +22,10 @@ private:
 
     SDL_Window *window;
     SDL_Renderer *renderer;
+
+    Player player;
+
+    Uint64 lastTime;
 };
 
 #endif //SOMBRAESCARLATE_GAME_HPP
