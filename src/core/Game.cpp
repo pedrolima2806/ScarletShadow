@@ -32,7 +32,7 @@ bool Game::init() {
     return true;
 }
 
-//loop
+//Loop
 void Game::run() {
     while (running) {
         processEvents();
@@ -41,7 +41,7 @@ void Game::run() {
     }
 }
 
-//processa os eventos
+//Processa os eventos
 void Game::processEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -51,4 +51,21 @@ void Game::processEvents() {
     }
 }
 
-//
+//Update
+void Game::update() {
+
+}
+
+//Renderização
+void Game::render() {
+    SDL_SetRenderDrawColor(
+        renderer,
+        20,
+        20,
+        30,
+        255
+    );
+
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+}

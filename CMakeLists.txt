@@ -32,6 +32,8 @@ add_executable(SombraEscarlate
 
 target_include_directories(SombraEscarlate PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor
+
 )
 
 # ============================================================
