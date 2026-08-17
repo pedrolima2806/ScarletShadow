@@ -21,6 +21,9 @@ add_subdirectory(vendor/SDL_ttf)
 
 add_executable(SombraEscarlate
         src/main.cpp
+        src/core/Game.cpp
+        src/core/Game.hpp
+        src/core/Game.hpp
 )
 
 # ============================================================
