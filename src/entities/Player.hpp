@@ -4,18 +4,20 @@
 
 #include "SDL3/SDL_render.h"
 #include "../entities/Platform.hpp"
+#include "../world/Tile.hpp"
 
 class Player {
 public:
     Player(float x, float y);
 
     void handleInput(const SDL_Event &event);
-    void jump();
 
     void update(float deltaTime,
                 float screenWidth,
                 float screenHeight,
-                const std::vector<Platform>& platforms);
+                const std::vector<Platform>& platforms,
+                const std::vector<Tile>& tiles
+                );
     void render(SDL_Renderer* renderer);
 
 private:
@@ -31,9 +33,6 @@ private:
     float speed;
     float gravity;
     float jumpForce;
-
-    float jumpBufferTimer;
-    float jumpBufferDuration;
 
     bool onGround;
     bool movingLeft;

@@ -1,6 +1,28 @@
 #include "Level.hpp"
 
 Level::Level() {
+    constexpr float TILE_SIZE = 30.0f;
+    tiles.emplace_back(
+       100.0f,
+       280.0f,
+       TILE_SIZE,
+       TileType::Solid
+   );
+
+    tiles.emplace_back(
+        140.0f,
+        280.0f,
+        TILE_SIZE,
+        TileType::Hazard
+    );
+
+    tiles.emplace_back(
+        180.0f,
+        280.0f,
+        TILE_SIZE,
+        TileType::Solid
+    );
+
     platforms.emplace_back(
         0.0f,
         470.0f,
@@ -24,6 +46,10 @@ Level::Level() {
 }
 
 void Level::render(SDL_Renderer *renderer) const {
+    for (const Tile& tile : tiles) {
+        tile.render(renderer);
+    }
+
     for (const Platform &platform : platforms) {
         platform.render(renderer);
     }
@@ -31,4 +57,8 @@ void Level::render(SDL_Renderer *renderer) const {
 
 const std::vector<Platform> &Level::getPlatforms() const {
     return platforms;
+}
+
+const std::vector<Tile> &Level::getTiles() const {
+    return tiles;
 }

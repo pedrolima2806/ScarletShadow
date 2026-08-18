@@ -30,6 +30,8 @@ add_executable(SombraEscarlate
         src/entities/Platform.hpp
         src/world/Level.cpp
         src/world/Level.hpp
+        src/world/Tile.cpp
+        src/world/Tile.hpp
 )
 
 # ============================================================

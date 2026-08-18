@@ -72,7 +72,8 @@ void Game::update() {
     player.update(deltaTime,
                   static_cast<float>(SCREEN_WIDTH),
                   static_cast<float>(SCREEN_HEIGHT),
-                  level.getPlatforms()
+                  level.getPlatforms(),
+                  level.getTiles()
                   );
 }
 
