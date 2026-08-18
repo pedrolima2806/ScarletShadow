@@ -1,6 +1,7 @@
 #ifndef SOMBRAESCARLATE_PLAYER_HPP
 #define SOMBRAESCARLATE_PLAYER_HPP
 #include "SDL3/SDL_render.h"
+#include "../entities/Platform.hpp"
 
 class Player {
 public:
@@ -9,7 +10,10 @@ public:
     void handleInput(const SDL_Event &event);
     void jump();
 
-    void update(float deltaTime);
+    void update(float deltaTime,
+                float screenWidth,
+                float screenHeight,
+                const Platform& platform);
     void render(SDL_Renderer* renderer);
 
 private:

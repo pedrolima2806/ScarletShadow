@@ -26,6 +26,8 @@ add_executable(SombraEscarlate
         src/core/Game.hpp
         src/entities/Player.cpp
         src/entities/Player.hpp
+        src/entities/Platform.cpp
+        src/entities/Platform.hpp
 )
 
 # ============================================================

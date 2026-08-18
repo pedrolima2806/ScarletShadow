@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 
 #include "../entities/Player.hpp"
+#include "../entities/Platform.hpp"
 
 class Game {
 public:
@@ -20,10 +21,14 @@ private:
 
     bool running;
 
+    static constexpr int SCREEN_WIDTH = 640;
+    static constexpr int SCREEN_HEIGHT = 480;
+
     SDL_Window *window;
     SDL_Renderer *renderer;
 
     Player player;
+    Platform ground;
 
     Uint64 lastTime;
 };

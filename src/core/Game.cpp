@@ -4,7 +4,11 @@
 #include <ostream>
 
 Game::Game()
-    : running(true), window(nullptr), renderer(nullptr), player(100.f, 100.f) {
+    : running(true),
+      window(nullptr),
+      renderer(nullptr),
+      player(100.f, 100.f),
+      ground(0.0f, 400.0f, static_cast<float>(SCREEN_WIDTH), 10.0), lastTime(0) {
 }
 
 Game::~Game() {
@@ -21,8 +25,8 @@ bool Game::init() {
     }
     if (!SDL_CreateWindowAndRenderer(
             "Sombra Escarlate",
-            640,
-            480,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
             0,
             &window,
             &renderer))
@@ -60,7 +64,7 @@ void Game::update() {
     float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
     lastTime = currentTime;
 
-    player.update(deltaTime);
+    player.update(deltaTime, static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT), ground);
 }
 
 //Renderização
@@ -76,6 +80,7 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
     player.render(renderer);
+    ground.render(renderer);
 
     SDL_RenderPresent(renderer);
 }

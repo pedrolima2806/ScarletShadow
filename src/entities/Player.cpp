@@ -65,7 +65,11 @@ void Player::jump() {
     }
 }
 
-void Player::update(float deltaTime)
+void Player::update(
+    float deltaTime,
+    float screenWidth,
+    float screenHeight,
+    const Platform& platform)
 {
     // Movimento horizontal
     velocityX = 0.0f;
@@ -90,23 +94,63 @@ void Player::update(float deltaTime)
     // Gravidade
     velocityY += gravity * deltaTime;
 
+    //Guarda y anterior
+    float previousY = y;
+
+    //==========
     // Movimento
+    //==========
     x += velocityX * deltaTime;
     y += velocityY * deltaTime;
 
-    // Solo
-    const float groundY = 400.0f;
+    //===============
+    //Limites da tela
+    //===============
 
-    if (y + height >= groundY)
+    //Limite esquerdo
+    if (x < 0.0f)
     {
-        y = groundY - height;
+        x = 0.0f;
+    }
+
+    // Limite direito
+    if (x + width > screenWidth)
+    {
+        x = screenWidth - width;
+    }
+
+    // Limite superior
+    // if (y < 0.0f)
+    // {
+    //     y = 0.0f;
+    //
+    //     if (velocityY < 0.0f)
+    //     {
+    //         velocityY = 0.0f;
+    //     }
+    // }
+
+    //======================
+    //Colisão com Plataforma
+    //======================
+    const SDL_FRect& platformRect = platform.getRect();
+
+    bool horizontalCollision = x + width > platformRect.x && x < platformRect.x + platformRect.w;
+
+    bool wasAbove = previousY + height <= platformRect.y;
+
+    bool isTouchingPlatform = y + height >= platformRect.y;
+
+    if (
+        velocityY >= 0.0f && horizontalCollision && wasAbove && isTouchingPlatform) {
+        y = platformRect.y - height;
         velocityY = 0.0f;
         onGround = true;
     }
-    else
-    {
+    else {
         onGround = false;
     }
+
 }
 
 void Player::render(SDL_Renderer* renderer) {
