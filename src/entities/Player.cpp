@@ -16,6 +16,14 @@ Player::Player(float x, float y):
     jumpHeld(false)
 {}
 
+void Player::setPosition(float newX, float newY) {
+    x = newX;
+    y = newY;
+
+    velocityX = 0.0f;
+    velocityY = 0.0f;
+}
+
 void Player::handleInput(const SDL_Event& event)
 {
     if (event.type == SDL_EVENT_KEY_DOWN)
@@ -233,5 +241,27 @@ void Player::render(SDL_Renderer* renderer) {
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
+}
+
+bool Player::isTouchingHazard(const std::vector<Tile>& tiles) const {
+    for (const Tile& tile : tiles) {
+        if (tile.getType() != TileType::Hazard) {
+            continue;
+        }
+
+        const SDL_FRect& tileRect = tile.getRect();
+
+        bool collision =
+            x < tileRect.x + tileRect.w &&
+            x + width > tileRect.x &&
+            y < tileRect.y + tileRect.h &&
+            y + height > tileRect.y;
+
+
+        if (collision) {
+            return true;
+        }
+    }
+    return false;
 }
 

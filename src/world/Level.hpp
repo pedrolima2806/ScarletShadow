@@ -15,9 +15,15 @@ public:
     const std::vector<Platform> &getPlatforms() const;
     const std::vector<Tile> &getTiles() const;
 
+    float getSpawnX() const;
+    float getSpawnY() const;
+
 private:
     std::vector<Platform> platforms;
     std::vector<Tile> tiles;
+
+    float spawnX;
+    float spawnY;
 };
 
 #endif //SOMBRAESCARLATE_LEVEL_HPP

@@ -10,6 +10,8 @@ class Player {
 public:
     Player(float x, float y);
 
+    void setPosition(float newX, float newY);
+
     void handleInput(const SDL_Event &event);
 
     void update(float deltaTime,
@@ -19,6 +21,8 @@ public:
                 const std::vector<Tile>& tiles
                 );
     void render(SDL_Renderer* renderer);
+
+    bool isTouchingHazard(const std::vector<Tile>& tiles) const;
 
 private:
     float x;

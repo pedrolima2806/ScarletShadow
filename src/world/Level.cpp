@@ -1,6 +1,9 @@
 #include "Level.hpp"
 
-Level::Level() {
+Level::Level():
+    spawnX(100.0f),
+    spawnY(100.0f)
+{
     constexpr float TILE_SIZE = 30.0f;
     tiles.emplace_back(
        100.0f,
@@ -61,4 +64,12 @@ const std::vector<Platform> &Level::getPlatforms() const {
 
 const std::vector<Tile> &Level::getTiles() const {
     return tiles;
+}
+
+float Level::getSpawnX() const {
+    return spawnX;
+}
+
+float Level::getSpawnY() const {
+    return spawnY;
 }

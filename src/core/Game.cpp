@@ -75,6 +75,10 @@ void Game::update() {
                   level.getPlatforms(),
                   level.getTiles()
                   );
+
+    if (player.isTouchingHazard(level.getTiles())) {
+        player.setPosition(level.getSpawnX(), level.getSpawnY());
+    }
 }
 
 //Renderização
