@@ -1,5 +1,7 @@
 #ifndef SOMBRAESCARLATE_PLAYER_HPP
 #define SOMBRAESCARLATE_PLAYER_HPP
+#include <vector>
+
 #include "SDL3/SDL_render.h"
 #include "../entities/Platform.hpp"
 
@@ -13,7 +15,7 @@ public:
     void update(float deltaTime,
                 float screenWidth,
                 float screenHeight,
-                const Platform& platform);
+                const std::vector<Platform>& platforms);
     void render(SDL_Renderer* renderer);
 
 private:

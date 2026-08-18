@@ -7,7 +7,7 @@ class Platform {
 public:
     Platform(float x, float y, float width, float height);
 
-    void render(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer) const;
 
     const SDL_FRect& getRect() const;
 

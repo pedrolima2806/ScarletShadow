@@ -4,7 +4,7 @@
 #include <SDL3/SDL.h>
 
 #include "../entities/Player.hpp"
-#include "../entities/Platform.hpp"
+#include "../world/Level.hpp"
 
 class Game {
 public:
@@ -28,7 +28,7 @@ private:
     SDL_Renderer *renderer;
 
     Player player;
-    Platform ground;
+    Level level;
 
     Uint64 lastTime;
 };

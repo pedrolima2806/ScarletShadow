@@ -4,11 +4,12 @@
 #include <ostream>
 
 Game::Game()
-    : running(true),
+    : running(false),
       window(nullptr),
       renderer(nullptr),
       player(100.f, 100.f),
-      ground(0.0f, 400.0f, static_cast<float>(SCREEN_WIDTH), 10.0), lastTime(0) {
+      lastTime(0)
+{
 }
 
 Game::~Game() {
@@ -34,6 +35,10 @@ bool Game::init() {
         std::cerr << "Erro ao criar janela ou renderer: " << SDL_GetError() << std::endl;
         return false;
     }
+
+    running = true;
+    lastTime = SDL_GetTicks();
+
     return true;
 }
 
@@ -64,7 +69,11 @@ void Game::update() {
     float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
     lastTime = currentTime;
 
-    player.update(deltaTime, static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT), ground);
+    player.update(deltaTime,
+                  static_cast<float>(SCREEN_WIDTH),
+                  static_cast<float>(SCREEN_HEIGHT),
+                  level.getPlatforms()
+                  );
 }
 
 //Renderização
@@ -79,8 +88,8 @@ void Game::render() {
 
     SDL_RenderClear(renderer);
 
+    level.render(renderer);
     player.render(renderer);
-    ground.render(renderer);
 
     SDL_RenderPresent(renderer);
 }

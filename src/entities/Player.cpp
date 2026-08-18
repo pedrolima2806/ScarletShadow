@@ -69,7 +69,7 @@ void Player::update(
     float deltaTime,
     float screenWidth,
     float screenHeight,
-    const Platform& platform)
+    const std::vector<Platform>& platforms)
 {
     // Movimento horizontal
     velocityX = 0.0f;
@@ -130,26 +130,30 @@ void Player::update(
     //     }
     // }
 
-    //======================
-    //Colisão com Plataforma
-    //======================
-    const SDL_FRect& platformRect = platform.getRect();
+    //=======================
+    //Colisão com Plataformas
+    //=======================
+    onGround = false;
 
-    bool horizontalCollision = x + width > platformRect.x && x < platformRect.x + platformRect.w;
+    for (const Platform& platform : platforms) {
+        const SDL_FRect& platformRect = platform.getRect();
 
-    bool wasAbove = previousY + height <= platformRect.y;
+        bool horizontalCollision = x + width > platformRect.x && x < platformRect.x + platformRect.w;
 
-    bool isTouchingPlatform = y + height >= platformRect.y;
+        bool wasAbove = previousY + height <= platformRect.y;
 
-    if (
-        velocityY >= 0.0f && horizontalCollision && wasAbove && isTouchingPlatform) {
-        y = platformRect.y - height;
-        velocityY = 0.0f;
-        onGround = true;
+        bool isTouchingPlatform = y + height >= platformRect.y;
+
+        if (velocityY >= 0.0f && horizontalCollision && wasAbove && isTouchingPlatform)
+        {
+            y = platformRect.y - height;
+            velocityY = 0.0f;
+            onGround = true;
+
+            break;
+        }
     }
-    else {
-        onGround = false;
-    }
+
 
 }
 

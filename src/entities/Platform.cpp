@@ -9,7 +9,7 @@ Platform::Platform(float x, float y, float width, float height) {
     };
 }
 
-void Platform::render(SDL_Renderer* renderer) {
+void Platform::render(SDL_Renderer* renderer) const {
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     SDL_RenderFillRect(renderer, &rect);
 }
