@@ -63,13 +63,7 @@ void Player::handleInput(const SDL_Event& event)
     }
 }
 
-void Player::update(
-    float deltaTime,
-    float screenWidth,
-    float screenHeight,
-    const std::vector<Platform>& platforms,
-    const std::vector<Tile>& tiles
-    )
+void Player::update(float deltaTime)
 {
     // Movimento horizontal
     velocityX = 0.0f;
@@ -94,141 +88,7 @@ void Player::update(
     // Gravidade
     velocityY += gravity * deltaTime;
 
-    //Guarda y anterior
-    float previousY = y;
-
-    //Detecta chão
-    bool groundedThisFrame = false;
-
-    //=============================
-    //Movimento e colisão com Tiles
-    //=============================
-
-    //Movimento e colisão horizontal
-    x += velocityX * deltaTime;
-
-    for (const Tile& tile : tiles)
-    {
-        if (!tile.isSolid())
-        {
-            continue;
-        }
-        const SDL_FRect& tileRect = tile.getRect();
-
-        bool collision =
-            x < tileRect.x + tileRect.w &&
-            x + width > tileRect.x &&
-            y < tileRect.y + tileRect.h &&
-            y + height > tileRect.y;
-
-        if (collision)
-        {
-            if (velocityX > 0.0f)
-            {
-                // Player estava indo para direita
-                x = tileRect.x - width;
-            }
-            else if (velocityX < 0.0f)
-            {
-                // Player estava indo para esquerda
-                x = tileRect.x + tileRect.w;
-            }
-
-            velocityX = 0.0f;
-        }
-    }
-
-    //Movimento e colisão vertical
-    y += velocityY * deltaTime;
-
-    for (const Tile& tile : tiles)
-    {
-        if (!tile.isSolid())
-        {
-            continue;
-        }
-        const SDL_FRect& tileRect = tile.getRect();
-
-        bool collision =
-            x < tileRect.x + tileRect.w &&
-            x + width > tileRect.x &&
-            y < tileRect.y + tileRect.h &&
-            y + height > tileRect.y;
-
-        if (collision)
-        {
-            if (velocityY > 0.0f)
-            {
-                // Player estava caindo
-                y = tileRect.y - height;
-                velocityY = 0.0f;
-
-                groundedThisFrame = true;
-            }
-            else if (velocityY < 0.0f)
-            {
-                // Player estava subindo
-                y = tileRect.y + tileRect.h;
-
-                velocityY = 0.0f;
-            }
-        }
-    }
-
-    //===============
-    //Limites da tela
-    //===============
-
-    //Limite esquerdo
-    if (x < 0.0f)
-    {
-        x = 0.0f;
-    }
-
-    // Limite direito
-    if (x + width > screenWidth)
-    {
-        x = screenWidth - width;
-    }
-
-    // Limite superior
-    // if (y < 0.0f)
-    // {
-    //     y = 0.0f;
-    //
-    //     if (velocityY < 0.0f)
-    //     {
-    //         velocityY = 0.0f;
-    //     }
-    // }
-
-    //=======================
-    //Colisão com Plataformas
-    //=======================
-
-    for (const Platform& platform : platforms) {
-        const SDL_FRect& platformRect = platform.getRect();
-
-        bool horizontalCollision = x + width > platformRect.x && x < platformRect.x + platformRect.w;
-
-        bool wasAbove = previousY + height <= platformRect.y;
-
-        bool isTouchingPlatform = y + height >= platformRect.y;
-
-        if (velocityY >= 0.0f && horizontalCollision && wasAbove && isTouchingPlatform)
-        {
-            y = platformRect.y - height;
-            velocityY = 0.0f;
-
-            groundedThisFrame = true;
-
-            break;
-        }
-    }
-    //====================
-    //Estado final do chão
-    //====================
-    onGround = groundedThisFrame;
+    onGround = false;
 }
 
 void Player::render(SDL_Renderer* renderer) {
@@ -243,25 +103,48 @@ void Player::render(SDL_Renderer* renderer) {
     SDL_RenderFillRect(renderer, &rect);
 }
 
-bool Player::isTouchingHazard(const std::vector<Tile>& tiles) const {
-    for (const Tile& tile : tiles) {
-        if (tile.getType() != TileType::Hazard) {
-            continue;
-        }
-
-        const SDL_FRect& tileRect = tile.getRect();
-
-        bool collision =
-            x < tileRect.x + tileRect.w &&
-            x + width > tileRect.x &&
-            y < tileRect.y + tileRect.h &&
-            y + height > tileRect.y;
-
-
-        if (collision) {
-            return true;
-        }
-    }
-    return false;
+SDL_FRect Player::getRect() const
+{
+    return {
+        x,
+        y,
+        width,
+        height
+    };
 }
 
+float Player::getVelocityX() const
+{
+    return velocityX;
+}
+
+float Player::getVelocityY() const
+{
+    return velocityY;
+}
+
+void Player::moveX(float amount)
+{
+    x += amount;
+}
+
+void Player::moveY(float amount)
+{
+    y += amount;
+}
+
+void Player::resolveHorizontalCollision(float newX)
+{
+    x = newX;
+    velocityX = 0.0f;
+}
+
+void Player::resolveVerticalCollision(
+    float newY,
+    bool grounded
+)
+{
+    y = newY;
+    velocityY = 0.0f;
+    onGround = grounded;
+}

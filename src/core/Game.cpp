@@ -3,6 +3,8 @@
 #include <iostream>
 #include <ostream>
 
+#include "physics/CollisionSystem.hpp"
+
 Game::Game()
     : running(false),
       window(nullptr),
@@ -69,15 +71,18 @@ void Game::update() {
     float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
     lastTime = currentTime;
 
-    player.update(deltaTime,
-                  static_cast<float>(SCREEN_WIDTH),
-                  static_cast<float>(SCREEN_HEIGHT),
-                  level.getPlatforms(),
-                  level.getTiles()
-                  );
+    player.update(deltaTime);
 
-    if (player.isTouchingHazard(level.getTiles())) {
-        player.setPosition(level.getSpawnX(), level.getSpawnY());
+    CollisionSystem::resolvePlayerCollisions(player, level, deltaTime);
+
+    if (CollisionSystem::isPlayerTouchingHazard(
+        player,
+        level))
+    {
+        player.setPosition(
+            level.getSpawnX(),
+            level.getSpawnY()
+        );
     }
 }
 

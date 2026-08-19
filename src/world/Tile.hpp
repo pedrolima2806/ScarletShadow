@@ -13,8 +13,6 @@ class Tile {
 public:
     Tile(float x, float y, float size, TileType type);
 
-    Tile(float x, float y, float size);
-
     void render (SDL_Renderer* renderer) const;
 
     const SDL_FRect& getRect() const;

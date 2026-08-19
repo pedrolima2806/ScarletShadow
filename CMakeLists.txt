@@ -32,6 +32,9 @@ add_executable(SombraEscarlate
         src/world/Level.hpp
         src/world/Tile.cpp
         src/world/Tile.hpp
+        src/physics/CollisionSystem.cpp
+        src/physics/CollisionSystem.hpp
+        src/physics/CollisionSystem.hpp
 )
 
 # ============================================================

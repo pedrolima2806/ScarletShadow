@@ -1,10 +1,7 @@
 #ifndef SOMBRAESCARLATE_PLAYER_HPP
 #define SOMBRAESCARLATE_PLAYER_HPP
-#include <vector>
 
 #include "SDL3/SDL_render.h"
-#include "../entities/Platform.hpp"
-#include "../world/Tile.hpp"
 
 class Player {
 public:
@@ -14,15 +11,19 @@ public:
 
     void handleInput(const SDL_Event &event);
 
-    void update(float deltaTime,
-                float screenWidth,
-                float screenHeight,
-                const std::vector<Platform>& platforms,
-                const std::vector<Tile>& tiles
-                );
+    void update(float deltaTime);
     void render(SDL_Renderer* renderer);
 
-    bool isTouchingHazard(const std::vector<Tile>& tiles) const;
+    SDL_FRect getRect() const;
+
+    float getVelocityX() const;
+    float getVelocityY() const;
+
+    void moveX(float amount);
+    void moveY(float amount);
+
+    void resolveHorizontalCollision(float newX);
+    void resolveVerticalCollision(float newY, bool grounded);
 
 private:
     float x;
