@@ -91,10 +91,10 @@ void Player::update(float deltaTime)
     onGround = false;
 }
 
-void Player::render(SDL_Renderer* renderer) {
+void Player::render(SDL_Renderer* renderer, const Camera& camera) {
     SDL_FRect rect{
-        x,
-        y,
+        x - camera.getX(),
+        y - camera.getY(),
         width,
         height
     };

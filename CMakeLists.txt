@@ -35,6 +35,8 @@ add_executable(SombraEscarlate
         src/physics/CollisionSystem.cpp
         src/physics/CollisionSystem.hpp
         src/physics/CollisionSystem.hpp
+        src/render/Camera.cpp
+        src/render/Camera.hpp
 )
 
 # ============================================================

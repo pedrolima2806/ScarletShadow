@@ -75,7 +75,7 @@ void CollisionSystem::resolvePlayerCollisions(
     playerRect = player.getRect();
 
     // Borda direita
-    if (playerRect.x + playerRect.w > screenWidth)
+    if (playerRect.x + playerRect.w > level.getWorldWidth())
     {
         player.resolveHorizontalCollision(
             screenWidth - playerRect.w
@@ -211,7 +211,7 @@ void CollisionSystem::resolvePlayerCollisions(
     // playerRect = player.getRect();
     //
     // // Fundo
-    // if (playerRect.y + playerRect.h > screenHeight)
+    // if (playerRect.y + playerRect.h > level.getWorldHeight())
     // {
     //     player.resolveVerticalCollision(
     //         screenHeight - playerRect.h,

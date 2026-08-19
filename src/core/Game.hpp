@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 
 #include "../entities/Player.hpp"
+#include "../render/Camera.hpp"
 #include "../world/Level.hpp"
 
 class Game {
@@ -28,6 +29,7 @@ private:
     SDL_Renderer *renderer;
 
     Player player;
+    Camera camera;
     Level level;
 
     Uint64 lastTime;

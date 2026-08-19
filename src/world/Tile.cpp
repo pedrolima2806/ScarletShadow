@@ -6,7 +6,7 @@ Tile::Tile(float x, float y, float size, TileType type)
 {
 }
 
-void Tile::render(SDL_Renderer* renderer) const {
+void Tile::render(SDL_Renderer* renderer, const Camera& camera) const {
     switch (type) {
         case TileType::Solid:
             SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
@@ -17,7 +17,15 @@ void Tile::render(SDL_Renderer* renderer) const {
         default:
             return;
     }
-    SDL_RenderFillRect(renderer, &rect);
+
+    SDL_FRect renderRect{
+        rect.x - camera.getX(),
+        rect.y - camera.getY(),
+        rect.w,
+        rect.h
+    };
+
+    SDL_RenderFillRect(renderer, &renderRect);
 }
 
 const SDL_FRect& Tile::getRect() const {

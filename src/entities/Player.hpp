@@ -3,6 +3,8 @@
 
 #include "SDL3/SDL_render.h"
 
+#include "../render/Camera.hpp"
+
 class Player {
 public:
     Player(float x, float y);
@@ -12,7 +14,7 @@ public:
     void handleInput(const SDL_Event &event);
 
     void update(float deltaTime);
-    void render(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer, const Camera& camera);
 
     SDL_FRect getRect() const;
 
