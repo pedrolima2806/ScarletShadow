@@ -38,6 +38,14 @@ bool Game::init() {
         return false;
     }
 
+    if (!level.loadFromFile("../assets/maps/level_01.map")){
+        std::cerr << "Falha ao carregar a fase." << std::endl;
+        return false;
+    }
+
+    const SDL_FPoint& spawn = level.getSpawn();
+    player.setPosition(spawn);
+
     running = true;
     lastTime = SDL_GetTicks();
 
@@ -73,15 +81,20 @@ void Game::update() {
 
     player.update(deltaTime);
 
-    CollisionSystem::resolvePlayerCollisions(player, level, deltaTime);
+    CollisionSystem::resolvePlayerCollisions(
+        player,
+        level,
+        deltaTime,
+        static_cast<float>(SCREEN_WIDTH),
+        static_cast<float>(SCREEN_HEIGHT)
+    );
 
     if (CollisionSystem::isPlayerTouchingHazard(
         player,
         level))
     {
         player.setPosition(
-            level.getSpawnX(),
-            level.getSpawnY()
+            level.getSpawn()
         );
     }
 }

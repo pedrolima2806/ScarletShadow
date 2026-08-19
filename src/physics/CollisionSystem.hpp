@@ -5,7 +5,7 @@
 
 class CollisionSystem {
 public:
-    static void resolvePlayerCollisions(Player& player, const Level& level, float deltaTime);
+    static void resolvePlayerCollisions(Player& player, const Level& level, float deltaTime, float screenWidth, float screenHeight);
     static bool isPlayerTouchingHazard(const Player& player, const Level& level);
 
 private:

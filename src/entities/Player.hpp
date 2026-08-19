@@ -7,7 +7,7 @@ class Player {
 public:
     Player(float x, float y);
 
-    void setPosition(float newX, float newY);
+    void setPosition(SDL_FPoint newPosition);
 
     void handleInput(const SDL_Event &event);
 

@@ -1,10 +1,11 @@
+#include <iostream>
+#include <fstream>
+
 #include "Level.hpp"
 
 Level::Level():
-    spawnX(100.0f),
-    spawnY(100.0f)
+    spawnPoint{0.0f, 0.0f}
 {
-    constexpr float TILE_SIZE = 30.0f;
     tiles.emplace_back(
        100.0f,
        280.0f,
@@ -48,6 +49,54 @@ Level::Level():
     );
 }
 
+bool Level::loadFromFile(const std::string &filePath) {
+    std::ifstream file(filePath);
+
+    if (!file.is_open())
+    {std::cerr << "Erro ao abrir mapa: " << filePath << std::endl;
+        return false;
+    }
+
+    tiles.clear();
+    platforms.clear();
+
+    std::string line;
+
+    int row = 0;
+    while (std::getline(file, line)) {
+        for (int col = 0; col < static_cast<int>(line.size()); col++) {
+            char symbol = line[col];
+
+            float x = static_cast<float>(col) * TILE_SIZE;
+            float y = static_cast<float>(row) * TILE_SIZE;
+
+            switch (symbol) {
+                case '.':
+                    break;
+
+                case '#':
+                    tiles.emplace_back(x, y, TILE_SIZE, TileType::Solid);
+                    break;
+                case '^':
+                    tiles.emplace_back(x, y, TILE_SIZE, TileType::Hazard);
+                    break;
+                case 'S':
+                    spawnPoint = {x, y};
+                    break;
+                case '=':
+                    platforms.emplace_back(x, y, TILE_SIZE, 10.0f);
+                    break;
+                default:
+                    std::cerr << "Símbolo desconhecido em: " << row << "," << col << std::endl;
+                    break;
+            }
+        }
+        ++row;
+    }
+
+    return true;
+}
+
 void Level::render(SDL_Renderer *renderer) const {
     for (const Tile& tile : tiles) {
         tile.render(renderer);
@@ -66,10 +115,8 @@ const std::vector<Tile> &Level::getTiles() const {
     return tiles;
 }
 
-float Level::getSpawnX() const {
-    return spawnX;
+const SDL_FPoint& Level::getSpawn() const {
+    return spawnPoint;
 }
 
-float Level::getSpawnY() const {
-    return spawnY;
-}
+

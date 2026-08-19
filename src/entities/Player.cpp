@@ -16,9 +16,9 @@ Player::Player(float x, float y):
     jumpHeld(false)
 {}
 
-void Player::setPosition(float newX, float newY) {
-    x = newX;
-    y = newY;
+void Player::setPosition(SDL_FPoint newPosition) {
+    x = newPosition.x;
+    y = newPosition.y;
 
     velocityX = 0.0f;
     velocityY = 0.0f;

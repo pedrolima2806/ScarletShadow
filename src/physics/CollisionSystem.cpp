@@ -1,20 +1,24 @@
 #include "CollisionSystem.hpp"
 
-#include "CollisionSystem.hpp"
-
 void CollisionSystem::resolvePlayerCollisions(
     Player& player,
     const Level& level,
-    float deltaTime
+    float deltaTime,
+    float screenWidth,
+    float screenHeight
 )
 {
-    // =====================
+    // =========================================================
     // Movimento horizontal
-    // =====================
+    // =========================================================
 
     float velocityX = player.getVelocityX();
 
     player.moveX(velocityX * deltaTime);
+
+    // ---------------------------------------------------------
+    // Colisão horizontal com Tiles sólidos
+    // ---------------------------------------------------------
 
     for (const Tile& tile : level.getTiles())
     {
@@ -37,12 +41,15 @@ void CollisionSystem::resolvePlayerCollisions(
             continue;
         }
 
+        // Player indo para direita
         if (velocityX > 0.0f)
         {
             player.resolveHorizontalCollision(
                 tileRect.x - playerRect.w
             );
         }
+
+        // Player indo para esquerda
         else if (velocityX < 0.0f)
         {
             player.resolveHorizontalCollision(
@@ -53,9 +60,32 @@ void CollisionSystem::resolvePlayerCollisions(
         break;
     }
 
-    // ===================
+    // ---------------------------------------------------------
+    // Limites horizontais da janela
+    // ---------------------------------------------------------
+
+    SDL_FRect playerRect = player.getRect();
+
+    // Borda esquerda
+    if (playerRect.x < 0.0f)
+    {
+        player.resolveHorizontalCollision(0.0f);
+    }
+
+    playerRect = player.getRect();
+
+    // Borda direita
+    if (playerRect.x + playerRect.w > screenWidth)
+    {
+        player.resolveHorizontalCollision(
+            screenWidth - playerRect.w
+        );
+    }
+
+
+    // =========================================================
     // Movimento vertical
-    // ===================
+    // =========================================================
 
     SDL_FRect beforeVertical = player.getRect();
 
@@ -65,9 +95,10 @@ void CollisionSystem::resolvePlayerCollisions(
 
     bool verticalResolved = false;
 
-    // =====================
-    // Tiles sólidos
-    // =====================
+
+    // ---------------------------------------------------------
+    // Colisão vertical com Tiles sólidos
+    // ---------------------------------------------------------
 
     for (const Tile& tile : level.getTiles())
     {
@@ -76,7 +107,8 @@ void CollisionSystem::resolvePlayerCollisions(
             continue;
         }
 
-        SDL_FRect playerRect = player.getRect();
+        playerRect = player.getRect();
+
         const SDL_FRect& tileRect = tile.getRect();
 
         bool collision =
@@ -90,6 +122,7 @@ void CollisionSystem::resolvePlayerCollisions(
             continue;
         }
 
+        // Player caindo
         if (velocityY > 0.0f)
         {
             player.resolveVerticalCollision(
@@ -97,6 +130,8 @@ void CollisionSystem::resolvePlayerCollisions(
                 true
             );
         }
+
+        // Player subindo
         else if (velocityY < 0.0f)
         {
             player.resolveVerticalCollision(
@@ -110,20 +145,20 @@ void CollisionSystem::resolvePlayerCollisions(
         break;
     }
 
-    // =====================
-    // Platforms one-way
-    // =====================
+
+    // =========================================================
+    // Colisão com Platforms
+    // Apenas por cima
+    // =========================================================
 
     if (!verticalResolved)
     {
         float previousBottom =
             beforeVertical.y + beforeVertical.h;
 
-        for (const Platform& platform :
-             level.getPlatforms())
+        for (const Platform& platform : level.getPlatforms())
         {
-            SDL_FRect playerRect =
-                player.getRect();
+            playerRect = player.getRect();
 
             const SDL_FRect& platformRect =
                 platform.getRect();
@@ -150,10 +185,39 @@ void CollisionSystem::resolvePlayerCollisions(
                     true
                 );
 
+                verticalResolved = true;
+
                 break;
             }
         }
     }
+
+
+    // =========================================================
+    // Limites verticais da janela
+    // =========================================================
+
+    // playerRect = player.getRect();
+    //
+    // // Teto
+    // if (playerRect.y < 0.0f)
+    // {
+    //     player.resolveVerticalCollision(
+    //         0.0f,
+    //         false
+    //     );
+    // }
+    //
+    // playerRect = player.getRect();
+    //
+    // // Fundo
+    // if (playerRect.y + playerRect.h > screenHeight)
+    // {
+    //     player.resolveVerticalCollision(
+    //         screenHeight - playerRect.h,
+    //         true
+    //     );
+    // }
 }
 
 
