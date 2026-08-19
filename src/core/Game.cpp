@@ -38,7 +38,7 @@ bool Game::init() {
         return false;
     }
 
-    if (!level.loadFromFile("../assets/maps/level_01.map")){
+    if (!level.loadFromFile("../assets/maps/level_02.map")){
         std::cerr << "Falha ao carregar a fase." << std::endl;
         return false;
     }
@@ -89,12 +89,15 @@ void Game::update() {
         static_cast<float>(SCREEN_HEIGHT)
     );
 
-    if (CollisionSystem::isPlayerTouchingHazard(
-        player,
-        level))
-    {
-        player.setPosition(
-            level.getSpawn()
+    //Lógica de retornar ao Spawn
+    SDL_FRect playerRect = player.getRect();
+
+    bool fellOutOfScreen = playerRect.y > static_cast<float>(SCREEN_HEIGHT) + 100.0f;
+    bool touchedHazard = CollisionSystem::isPlayerTouchingHazard(player, level);
+
+    if (fellOutOfScreen || touchedHazard) {
+        const SDL_FPoint& spawn = level.getSpawn();
+        player.setPosition(spawn
         );
     }
 }

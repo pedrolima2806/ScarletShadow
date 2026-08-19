@@ -14,6 +14,9 @@
                   <Item>
                     <option name="path" value="assets/maps/level_01.map" />
                   </Item>
+                  <Item>
+                    <option name="path" value="assets/maps/level_02.map" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>
