@@ -5,9 +5,12 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
-Menu::Menu(TTF_Font* font):
+Menu::Menu(TTF_Font* font, SDL_Texture* logo):
     selectedOption(0),
-    font(font)
+    font(font),
+    logoTexture(logo),
+    markerWidth(20.0f),
+    markerHeight(20.0f)
 {
     options.emplace_back("Jogar", MenuAction::START_GAME);
     options.emplace_back("Opções", MenuAction::OPTIONS);
@@ -44,26 +47,27 @@ MenuAction Menu::handleEvent(SDL_Event& event)
     return MenuAction::NONE;
 }
 
-void Menu::updateMenu() {
-
-}
-
-void Menu::renderMenu(SDL_Renderer* renderer)
+void Menu::renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight)
 {
-    float startX = 280.0f;
-    float startY = 200.0f;
-    float spacing = 60.0f;
+    float spacing = static_cast<float>(screenHeight) / 12.0f;
+
+    float startX;
+    float startY;
+
+    startX = static_cast<float>(screenWidth) / 2.0f;
+    startY = static_cast<float>(screenHeight) / 1.5f;
+
 
     for(int i = 0; i < options.size(); i++)
     {
-        float x = startX;
+        float x = startX - getTextWidth(options[i].text) / 2.0f;
         float y = startY + spacing * i;
 
         SDL_Color color;
 
         if(i == selectedOption)
         {
-            color = {255, 0, 0, 255}; // selecionado
+            color = {255, 0, 0, 255}; //Cor quando selecionado
         }
         else
         {
@@ -71,6 +75,12 @@ void Menu::renderMenu(SDL_Renderer* renderer)
         }
 
         renderText(renderer, options[i].text, color, x, y);
+
+        if (i == selectedOption) {
+            SDL_Color markerColor = {255, 0, 0, 255};
+            renderMarker(renderer, options[i].text, color, startX, y);
+            renderMarker(renderer, options[i].text, markerColor, startX, y);
+        }
     }
 }
 
@@ -88,11 +98,41 @@ void Menu::moveSelection(int direction) {
     }
 }
 
+float Menu::getTextWidth(const std::string& text) {
+    int width;
+    int height;
+
+    TTF_GetStringSize(font, text.c_str(), 0, &width, &height);
+
+    return static_cast<float>(width);
+}
+
+float Menu::getTextHeight(const std::string& text) {
+    int width;
+    int height;
+
+    TTF_GetStringSize(font, text.c_str(), 0, &width, &height);
+
+    return static_cast<float>(height);
+}
+
+void Menu::renderLogo(SDL_Renderer *renderer, int screenWidth, int screenHeight, SDL_Texture* logo, float x, float y) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    SDL_FRect logoRect;
+    logoRect.x = x;
+    logoRect.y = y;
+    logoRect.w = static_cast<float>(screenWidth);
+    logoRect.h = static_cast<float>(screenHeight);
+
+    SDL_RenderFillRect(renderer, &logoRect);
+}
+
 void Menu::renderText(SDL_Renderer *renderer,
-    const std::string &text,
-    SDL_Color color,
-    float x,
-    float y) {
+                      const std::string &text,
+                      SDL_Color color,
+                      float x,
+                      float y) {
     SDL_Surface* surface = TTF_RenderText_Solid(
         font,
         text.c_str(),
@@ -143,4 +183,31 @@ void Menu::renderText(SDL_Renderer *renderer,
 
     SDL_DestroyTexture(texture);
     SDL_DestroySurface(surface);
+}
+
+void Menu::renderMarker(SDL_Renderer *renderer, const std::string& text, SDL_Color color, float x, float y)
+{
+    float textWidth = getTextWidth(text);
+    float textHeight = getTextHeight(text);
+
+    markerWidth = textHeight;
+    markerHeight = textHeight;
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    SDL_FRect leftMarker;
+    leftMarker.x = x - markerWidth / 2.0f - textWidth / 2.0f - textHeight / 2.0f;
+    leftMarker.y = y + 0.15f * textHeight;
+    leftMarker.w = 0.6f * textHeight;
+    leftMarker.h = 0.6f * textHeight;
+
+    SDL_FRect rightMarker;
+    rightMarker.x = x + textWidth / 2.0f + textHeight / 2.0f;
+    rightMarker.y = y + 0.15f * textHeight;
+    rightMarker.w = 0.6f * textHeight;
+    rightMarker.h = 0.6f * textHeight;
+
+    SDL_RenderFillRect(renderer, &leftMarker);
+    SDL_RenderFillRect(renderer, &rightMarker);
+
 }

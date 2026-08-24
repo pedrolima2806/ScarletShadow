@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <SDL3_image/SDL_image.h>
 
 #include "physics/CollisionSystem.hpp"
 
@@ -10,7 +11,8 @@ Game::Game()
       running(false),
       window(nullptr),
       renderer(nullptr),
-      font(nullptr),
+      fontMenu(nullptr),
+      logoTexture(nullptr),
       menu(nullptr),
       camera(
           static_cast<float>(SCREEN_WIDTH),
@@ -21,6 +23,7 @@ Game::Game()
 Game::~Game() {
     if (renderer != nullptr) SDL_DestroyRenderer(renderer);
     if (window != nullptr) SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -46,14 +49,20 @@ bool Game::init() {
     if (!TTF_Init()) {
         std::cerr << "Erro ao iniciar SDL_ttf:" << SDL_GetError() << std::endl;
     }
-    font = TTF_OpenFont("../assets/fonts/Prata/Prata-Regular.ttf", SCREEN_HEIGHT/24);
-    if(!font)
+    fontMenu = TTF_OpenFont("../assets/fonts/Prata/Prata-Regular.ttf", SCREEN_HEIGHT/24.0f);
+    if(!fontMenu)
     {
-        std::cerr << "Erro carregando fonte\n";
+        std::cerr << "Erro carregando fonte.\n";
         return false;
     }
 
-    menu = std::make_unique<Menu>(font);
+    logoTexture = IMG_LoadTexture(renderer,"../assets/sprites/menu/Menu_Logo.png");
+    if (!logoTexture) {
+        std::cerr << "Erro carregando logo:" << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    menu = std::make_unique<Menu>(fontMenu, logoTexture);
 
     running = true;
     lastTime = SDL_GetTicks();
@@ -155,7 +164,7 @@ void Game::render() {
 
     switch (gameState) {
         case GameState::MENU:
-            menu->renderMenu(renderer);
+            menu->renderMenu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
             break;
         case GameState::PLAYING:
             renderPlaying();

@@ -2,13 +2,14 @@
 #define SOMBRAESCARLATE_GAME_HPP
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 
 #include "GameState.hpp"
+#include "Menu.hpp"
 #include "../entities/Player.hpp"
 #include "../render/Camera.hpp"
 #include "../world/Level.hpp"
-#include "Menu.hpp"
 
 class Game {
 public:
@@ -39,7 +40,8 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    TTF_Font *font;
+    TTF_Font* fontMenu;
+    SDL_Texture* logoTexture;
 
     std::unique_ptr<Menu> menu;
 

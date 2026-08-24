@@ -22,25 +22,29 @@ struct MenuOption {
 
 class Menu {
 public:
-    Menu(TTF_Font* font);
+    Menu(TTF_Font* font, SDL_Texture* logo);
 
     MenuAction handleEvent(SDL_Event &event);
-    void updateMenu();
-    void renderMenu(SDL_Renderer* renderer);
+    void renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight);
 
     void moveSelection(int direction);
 
-    void renderText(SDL_Renderer* renderer,
-        const std::string& text,
-        SDL_Color color,
-        float x,
-        float y);
+    float getTextWidth(const std::string& text);
+    float getTextHeight(const std::string& text);
+
+    void renderLogo(SDL_Renderer* renderer, int screenWidth, int screenHeight, SDL_Texture* logo, float x, float y);
+    void renderText(SDL_Renderer* renderer, const std::string& text, SDL_Color color, float x, float y);
+    void renderMarker(SDL_Renderer* renderer, const std::string& text, SDL_Color color, float x, float y);
 
 private:
     int selectedOption;
     std::vector<MenuOption> options;
 
     TTF_Font* font;
+    SDL_Texture* logoTexture;
+
+    float markerWidth;
+    float markerHeight;
 };
 
 #endif //SOMBRAESCARLATE_MENU_HPP
