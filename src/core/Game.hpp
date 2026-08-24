@@ -2,10 +2,13 @@
 #define SOMBRAESCARLATE_GAME_HPP
 
 #include <SDL3/SDL.h>
+#include <memory>
 
+#include "GameState.hpp"
 #include "../entities/Player.hpp"
 #include "../render/Camera.hpp"
 #include "../world/Level.hpp"
+#include "Menu.hpp"
 
 class Game {
 public:
@@ -16,9 +19,17 @@ public:
     void run();
 
 private:
+    void startGame();
+    void returnToMenu();
+
     void processEvents();
     void update();
     void render();
+
+    void renderPlaying();
+    void updatePlaying();
+
+    GameState gameState;
 
     bool running;
 
@@ -28,11 +39,16 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    Player player;
+    TTF_Font *font;
+
+    std::unique_ptr<Menu> menu;
+
+    std::unique_ptr<Player> player;
     Camera camera;
-    Level level;
+    std::unique_ptr<Level> level;
 
     Uint64 lastTime;
+
 };
 
 #endif //SOMBRAESCARLATE_GAME_HPP

@@ -6,15 +6,16 @@
 #include "physics/CollisionSystem.hpp"
 
 Game::Game()
-    : running(false),
+    : gameState(GameState::MENU),
+      running(false),
       window(nullptr),
       renderer(nullptr),
-      player(100.f, 100.f),
+      font(nullptr),
+      menu(nullptr),
       camera(
           static_cast<float>(SCREEN_WIDTH),
           static_cast<float>(SCREEN_HEIGHT)),
-      lastTime(0)
-{
+      lastTime(0) {
 }
 
 Game::~Game() {
@@ -30,24 +31,29 @@ bool Game::init() {
         return false;
     }
     if (!SDL_CreateWindowAndRenderer(
-            "Sombra Escarlate",
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT,
-            0,
-            &window,
-            &renderer))
+        "Sombra Escarlate",
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        0,
+        &window,
+        &renderer))
     {
         std::cerr << "Erro ao criar janela ou renderer: " << SDL_GetError() << std::endl;
         return false;
     }
 
-    if (!level.loadFromFile("../assets/maps/level_03.map")){
-        std::cerr << "Falha ao carregar a fase." << std::endl;
+    //Fonte usada pelo jogo
+    if (!TTF_Init()) {
+        std::cerr << "Erro ao iniciar SDL_ttf:" << SDL_GetError() << std::endl;
+    }
+    font = TTF_OpenFont("../assets/fonts/Prata/Prata-Regular.ttf", SCREEN_HEIGHT/24);
+    if(!font)
+    {
+        std::cerr << "Erro carregando fonte\n";
         return false;
     }
 
-    const SDL_FPoint& spawn = level.getSpawn();
-    player.setPosition(spawn);
+    menu = std::make_unique<Menu>(font);
 
     running = true;
     lastTime = SDL_GetTicks();
@@ -64,6 +70,29 @@ void Game::run() {
     }
 }
 
+//Lógica do menu
+void Game::startGame() {
+    level = std::make_unique<Level>();
+    player = std::make_unique<Player>(100.0f,100.0f);
+
+    if (!level->loadFromFile("../assets/maps/level_03.map")){
+        std::cerr << "Falha ao carregar a fase." << std::endl;
+        return;
+    }
+
+    const SDL_FPoint& spawn = level->getSpawn();
+    player->setPosition(spawn);
+
+    gameState = GameState::PLAYING;
+}
+
+void Game::returnToMenu() {
+
+
+    gameState = GameState::MENU;
+
+}
+
 //Processa os eventos
 void Game::processEvents() {
     SDL_Event event;
@@ -71,46 +100,45 @@ void Game::processEvents() {
         if (event.type == SDL_EVENT_QUIT) {
             running = false;
         }
-        player.handleInput(event);
+        if (gameState == GameState::MENU) {
+            MenuAction action = menu->handleEvent(event);
+
+            switch(action)
+            {
+                case MenuAction::START_GAME:
+                    startGame();
+                    break;
+
+                case MenuAction::OPTIONS:
+                    break;
+
+                case MenuAction::EXIT:
+                    running = false;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        else if (gameState == GameState::PLAYING) {
+            player->handleInput(event);
+        }
     }
 }
 
+//======
 //Update
+//======
 void Game::update() {
-    Uint64 currentTime = SDL_GetTicks();
-
-    float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
-    lastTime = currentTime;
-
-    player.update(deltaTime);
-
-    CollisionSystem::resolvePlayerCollisions(
-        player,
-        level,
-        deltaTime,
-        static_cast<float>(SCREEN_WIDTH),
-        static_cast<float>(SCREEN_HEIGHT)
-    );
-
-    //Lógica de retornar ao Spawn
-    SDL_FRect playerRect = player.getRect();
-
-    bool fellOutOfScreen = playerRect.y > level.getWorldHeight();
-    bool touchedHazard = CollisionSystem::isPlayerTouchingHazard(player, level);
-
-    if (fellOutOfScreen || touchedHazard) {
-        const SDL_FPoint& spawn = level.getSpawn();
-        player.setPosition(spawn
-        );
+    switch (gameState) {
+        case GameState::MENU:
+            break;
+        case GameState::PLAYING:
+            updatePlaying();
+            break;
+        default:
+            break;
     }
-
-    camera.follow(
-        player.getRect(),
-        level.getWorldWidth(),
-        level.getWorldHeight()
-        );
-
-
 }
 
 //Renderização
@@ -125,8 +153,57 @@ void Game::render() {
 
     SDL_RenderClear(renderer);
 
-    level.render(renderer, camera);
-    player.render(renderer, camera);
+    switch (gameState) {
+        case GameState::MENU:
+            menu->renderMenu(renderer);
+            break;
+        case GameState::PLAYING:
+            renderPlaying();
+            break;
+        case GameState::RUNNING:
+            break;
+        case GameState::PAUSED:
+            break;
+    }
 
     SDL_RenderPresent(renderer);
+}
+
+void Game::renderPlaying() {
+    level->render(renderer, camera);
+    player->render(renderer, camera);
+}
+
+void Game::updatePlaying() {
+    Uint64 currentTime = SDL_GetTicks();
+
+    float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
+    lastTime = currentTime;
+
+    player->update(deltaTime);
+
+    CollisionSystem::resolvePlayerCollisions(
+        *player,
+        *level,
+        deltaTime,
+        static_cast<float>(SCREEN_WIDTH),
+        static_cast<float>(SCREEN_HEIGHT)
+    );
+
+    //Lógica de retornar ao Spawn
+    SDL_FRect playerRect = player->getRect();
+
+    bool fellOutOfScreen = playerRect.y > level->getWorldHeight();
+    bool touchedHazard = CollisionSystem::isPlayerTouchingHazard(*player, *level);
+
+    if (fellOutOfScreen || touchedHazard) {
+        const SDL_FPoint& spawn = level->getSpawn();
+        player->setPosition(spawn);
+    }
+
+    camera.follow(
+        player->getRect(),
+        level->getWorldWidth(),
+        level->getWorldHeight()
+    );
 }
