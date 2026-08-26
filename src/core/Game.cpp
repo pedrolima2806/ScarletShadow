@@ -7,7 +7,8 @@
 #include "physics/CollisionSystem.hpp"
 
 Game::Game()
-    : gameState(GameState::MENU),
+    : deltaTime(0.0f),
+      gameState(GameState::MENU),
       running(false),
       window(nullptr),
       renderer(nullptr),
@@ -49,7 +50,7 @@ bool Game::init() {
     if (!TTF_Init()) {
         std::cerr << "Erro ao iniciar SDL_ttf:" << SDL_GetError() << std::endl;
     }
-    fontMenu = TTF_OpenFont("../assets/fonts/Prata/Prata-Regular.ttf", SCREEN_HEIGHT/24.0f);
+    fontMenu = TTF_OpenFont("../assets/fonts/Cinzel/Cinzel-VariableFont_wght.ttf", SCREEN_HEIGHT/24.0f);
     if(!fontMenu)
     {
         std::cerr << "Erro carregando fonte.\n";
@@ -139,11 +140,18 @@ void Game::processEvents() {
 //Update
 //======
 void Game::update() {
+    Uint64 currentTime = SDL_GetTicks();
+
+    float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
+    lastTime = currentTime;
+
+
     switch (gameState) {
         case GameState::MENU:
+            menu->updateMenu(deltaTime);
             break;
         case GameState::PLAYING:
-            updatePlaying();
+            updatePlaying(deltaTime);
             break;
         default:
             break;
@@ -183,12 +191,7 @@ void Game::renderPlaying() {
     player->render(renderer, camera);
 }
 
-void Game::updatePlaying() {
-    Uint64 currentTime = SDL_GetTicks();
-
-    float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
-    lastTime = currentTime;
-
+void Game::updatePlaying(float deltaTime) {
     player->update(deltaTime);
 
     CollisionSystem::resolvePlayerCollisions(

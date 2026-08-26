@@ -22,17 +22,18 @@ struct MenuOption {
 
 class Menu {
 public:
-    Menu(TTF_Font* font, SDL_Texture* logo);
+    Menu(TTF_Font* font, SDL_Texture* logo, SDL_Texture* backgroundTexture);
 
     MenuAction handleEvent(SDL_Event &event);
     void renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight);
+    void updateMenu(float deltaTime);
 
     void moveSelection(int direction);
 
     float getTextWidth(const std::string& text);
     float getTextHeight(const std::string& text);
 
-    void renderLogo(SDL_Renderer* renderer, int screenWidth, int screenHeight, SDL_Texture* logo, float x, float y);
+    void renderLogo(SDL_Renderer* renderer, int screenWidth, int screenHeight, float x, float y);
     void renderText(SDL_Renderer* renderer, const std::string& text, SDL_Color color, float x, float y);
     void renderMarker(SDL_Renderer* renderer, const std::string& text, SDL_Color color, float x, float y);
 
@@ -42,9 +43,20 @@ private:
 
     TTF_Font* font;
     SDL_Texture* logoTexture;
+    SDL_Texture* backgroundTexture;
 
     float markerWidth;
     float markerHeight;
+
+    //Animação
+    SDL_FRect logoAnimationLoop();
+
+    int currentFrame;
+    float frameTimer;
+    float frameDuration;
+
+    int frameWidth;
+    int frameHeight;
 };
 
 #endif //SOMBRAESCARLATE_MENU_HPP

@@ -28,7 +28,9 @@ private:
     void render();
 
     void renderPlaying();
-    void updatePlaying();
+    void updatePlaying(float deltaTime);
+
+    float deltaTime;
 
     GameState gameState;
 

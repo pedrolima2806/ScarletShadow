@@ -5,12 +5,17 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
-Menu::Menu(TTF_Font* font, SDL_Texture* logo):
+Menu::Menu(TTF_Font* font, SDL_Texture* logo, SDL_Texture* backgroundTexture):
     selectedOption(0),
     font(font),
     logoTexture(logo),
     markerWidth(20.0f),
-    markerHeight(20.0f)
+    markerHeight(20.0f),
+    currentFrame(0),
+    frameTimer(0.0f),
+    frameDuration(0.1f),
+    frameWidth(256),
+    frameHeight(128)
 {
     options.emplace_back("Jogar", MenuAction::START_GAME);
     options.emplace_back("Opções", MenuAction::OPTIONS);
@@ -58,6 +63,8 @@ void Menu::renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight)
     startY = static_cast<float>(screenHeight) / 1.5f;
 
 
+    renderLogo(renderer, screenWidth, screenHeight, startX, startY);
+
     for(int i = 0; i < options.size(); i++)
     {
         float x = startX - getTextWidth(options[i].text) / 2.0f;
@@ -80,6 +87,23 @@ void Menu::renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight)
             SDL_Color markerColor = {255, 0, 0, 255};
             renderMarker(renderer, options[i].text, color, startX, y);
             renderMarker(renderer, options[i].text, markerColor, startX, y);
+        }
+    }
+}
+
+void Menu::updateMenu(float deltaTime) {
+    frameTimer += deltaTime;
+
+    if(frameTimer >= frameDuration)
+    {
+        frameTimer = 0.0f;
+
+        currentFrame++;
+
+        // Após o frame 12 volta para o frame 0
+        if(currentFrame >= 12)
+        {
+            currentFrame = 0;
         }
     }
 }
@@ -116,16 +140,19 @@ float Menu::getTextHeight(const std::string& text) {
     return static_cast<float>(height);
 }
 
-void Menu::renderLogo(SDL_Renderer *renderer, int screenWidth, int screenHeight, SDL_Texture* logo, float x, float y) {
+void Menu::renderLogo(SDL_Renderer *renderer, int screenWidth, int screenHeight, float x, float y) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
-    SDL_FRect logoRect;
-    logoRect.x = x;
-    logoRect.y = y;
-    logoRect.w = static_cast<float>(screenWidth);
-    logoRect.h = static_cast<float>(screenHeight);
+    SDL_FRect src = logoAnimationLoop();
 
-    SDL_RenderFillRect(renderer, &logoRect);
+
+    SDL_FRect dst;
+    dst.w = static_cast<float>(screenHeight);
+    dst.h = static_cast<float>(screenHeight) / 2.0f;
+    dst.x = x - dst.w / 2.0f;
+    dst.y = 0.1f * y;
+
+    SDL_RenderTexture(renderer, logoTexture, &src, &dst);
 }
 
 void Menu::renderText(SDL_Renderer *renderer,
@@ -210,4 +237,18 @@ void Menu::renderMarker(SDL_Renderer *renderer, const std::string& text, SDL_Col
     SDL_RenderFillRect(renderer, &leftMarker);
     SDL_RenderFillRect(renderer, &rightMarker);
 
+}
+
+SDL_FRect Menu::logoAnimationLoop() {
+    SDL_FRect srcRect;
+
+    int column = currentFrame;
+    int row = 0;
+
+    srcRect.x = static_cast<float>(column * frameWidth);
+    srcRect.y = static_cast<float>(row * frameHeight);
+    srcRect.w = static_cast<float>(frameWidth);
+    srcRect.h = static_cast<float>(frameHeight);
+
+    return srcRect;
 }
