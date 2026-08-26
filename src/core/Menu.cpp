@@ -5,17 +5,25 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3_ttf/SDL_ttf.h"
 
-Menu::Menu(TTF_Font* font, SDL_Texture* logo, SDL_Texture* backgroundTexture):
+Menu::Menu(TTF_Font* font, SDL_Texture* logo, SDL_Texture* backgroundTexture, SDL_Texture* markerTexture):
     selectedOption(0),
     font(font),
     logoTexture(logo),
+    backgroundTexture(backgroundTexture),
+    markerTexture(markerTexture),
     markerWidth(20.0f),
     markerHeight(20.0f),
     currentFrame(0),
+    markerFrame(0),
     frameTimer(0.0f),
+    markerFrameTimer(0.0f),
     frameDuration(0.1f),
+    markerFrameDuration(0.1f),
     frameWidth(256),
-    frameHeight(128)
+    frameHeight(128),
+    markerFrameWidth(16),
+    markerFrameHeight(16),
+    menuCycleCounter(0)
 {
     options.emplace_back("Jogar", MenuAction::START_GAME);
     options.emplace_back("Opções", MenuAction::OPTIONS);
@@ -62,6 +70,35 @@ void Menu::renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight)
     startX = static_cast<float>(screenWidth) / 2.0f;
     startY = static_cast<float>(screenHeight) / 1.5f;
 
+    if(backgroundTexture)
+    {
+        float texW;
+        float texH;
+
+        SDL_GetTextureSize(backgroundTexture, &texW, &texH);
+
+        // escala baseada na altura da tela
+        float scale = static_cast<float>(screenHeight) / texH;
+
+        float bgWidth = texW * scale;
+        float bgHeight = texH * scale;
+
+        SDL_FRect bg;
+
+        // centraliza horizontalmente
+        bg.x = (screenWidth - bgWidth) / 2.0f;
+        bg.y = 0.0f;
+
+        bg.w = bgWidth;
+        bg.h = bgHeight;
+
+        SDL_RenderTexture(
+            renderer,
+            backgroundTexture,
+            nullptr,
+            &bg
+        );
+    }
 
     renderLogo(renderer, screenWidth, screenHeight, startX, startY);
 
@@ -93,17 +130,34 @@ void Menu::renderMenu(SDL_Renderer* renderer, int screenWidth, int screenHeight)
 
 void Menu::updateMenu(float deltaTime) {
     frameTimer += deltaTime;
+    markerFrameTimer += deltaTime;
 
-    if(frameTimer >= frameDuration)
+    if (frameTimer >= frameDuration)
     {
         frameTimer = 0.0f;
 
         currentFrame++;
 
-        // Após o frame 12 volta para o frame 0
-        if(currentFrame >= 12)
+        // Após o frame  volta para o frame 0
+        if (currentFrame >= 24 && menuCycleCounter % 5 != 0)
+        {
+            currentFrame = 13;
+            menuCycleCounter++;
+        }
+        if (currentFrame >= 24 && menuCycleCounter % 5 == 0)
         {
             currentFrame = 0;
+            menuCycleCounter++;
+        }
+    }
+
+    if (markerFrameTimer >= markerFrameDuration)
+    {
+        markerFrameTimer = 0.0f;
+        markerFrame++;
+
+        if (markerFrame >= 4) {
+            markerFrame = 0;
         }
     }
 }
@@ -145,12 +199,11 @@ void Menu::renderLogo(SDL_Renderer *renderer, int screenWidth, int screenHeight,
 
     SDL_FRect src = logoAnimationLoop();
 
-
     SDL_FRect dst;
-    dst.w = static_cast<float>(screenHeight);
-    dst.h = static_cast<float>(screenHeight) / 2.0f;
+    dst.w = static_cast<float>(screenHeight) / 1.5f;
+    dst.h = static_cast<float>(screenHeight) / 3.0f;
     dst.x = x - dst.w / 2.0f;
-    dst.y = 0.1f * y;
+    dst.y = 0.35f * y;
 
     SDL_RenderTexture(renderer, logoTexture, &src, &dst);
 }
@@ -224,19 +277,27 @@ void Menu::renderMarker(SDL_Renderer *renderer, const std::string& text, SDL_Col
 
     SDL_FRect leftMarker;
     leftMarker.x = x - markerWidth / 2.0f - textWidth / 2.0f - textHeight / 2.0f;
-    leftMarker.y = y + 0.15f * textHeight;
-    leftMarker.w = 0.6f * textHeight;
-    leftMarker.h = 0.6f * textHeight;
+    leftMarker.y = y - textHeight * 0.05f;
+    leftMarker.w = textHeight;
+    leftMarker.h = textHeight;
 
     SDL_FRect rightMarker;
-    rightMarker.x = x + textWidth / 2.0f + textHeight / 2.0f;
-    rightMarker.y = y + 0.15f * textHeight;
-    rightMarker.w = 0.6f * textHeight;
-    rightMarker.h = 0.6f * textHeight;
+    rightMarker.x = x + textWidth / 2.0f ;
+    rightMarker.y = y - textHeight * 0.05f;
+    rightMarker.w = textHeight;
+    rightMarker.h = textHeight;
 
-    SDL_RenderFillRect(renderer, &leftMarker);
-    SDL_RenderFillRect(renderer, &rightMarker);
+    SDL_FRect src;
+    int column = markerFrame;
+    int row = 0;
 
+    src.x = static_cast<float>(column * markerFrameWidth);
+    src.y = static_cast<float>(row * markerFrameHeight);
+    src.w = static_cast<float>(markerFrameWidth);
+    src.h = static_cast<float>(markerFrameHeight);
+
+    SDL_RenderTexture(renderer, markerTexture, &src, &leftMarker);
+    SDL_RenderTexture(renderer, markerTexture, &src, &rightMarker);
 }
 
 SDL_FRect Menu::logoAnimationLoop() {

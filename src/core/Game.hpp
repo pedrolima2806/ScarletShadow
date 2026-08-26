@@ -36,7 +36,7 @@ private:
 
     bool running;
 
-    static constexpr int SCREEN_WIDTH = 640;
+    static constexpr int SCREEN_WIDTH = 680;
     static constexpr int SCREEN_HEIGHT = 480;
 
     SDL_Window *window;

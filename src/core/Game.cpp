@@ -63,7 +63,11 @@ bool Game::init() {
         return false;
     }
 
-    menu = std::make_unique<Menu>(fontMenu, logoTexture);
+    SDL_Texture* menuBackgroundTexture = IMG_LoadTexture(renderer, "../assets/sprites/menu/Menu_Background.png");
+
+    SDL_Texture* menuMarkerTexture = IMG_LoadTexture(renderer, "../assets/sprites/menu/Menu_Marker.png");
+
+    menu = std::make_unique<Menu>(fontMenu, logoTexture, menuBackgroundTexture, menuMarkerTexture);
 
     running = true;
     lastTime = SDL_GetTicks();
